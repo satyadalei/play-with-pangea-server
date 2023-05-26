@@ -14,7 +14,7 @@ app.use(cors({
    credentials : true
 }));
 connectToMongoDB();
-//app.set('trust proxy', true);
+app.set('trust proxy', true);
 app.use(session({
    secret : process.env.SESSION_SECRET,
    store: MongoStore.create({
