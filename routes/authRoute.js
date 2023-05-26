@@ -24,7 +24,11 @@ router.post("/createuser", async (req,res)=>{
     }
 });
 router.get("/fetchuser",async (req,res)=>{
-    res.json({"msg":"user send successfully"})
+    if (req.session.isAuth) {
+        res.json({"msg":"User Authorised"})
+    }else{
+        res.json({"msg":"User NOT Authorised"})
+    }
 })
 
 
