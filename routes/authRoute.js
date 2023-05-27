@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const userModel = require('../models/userModel');
-
+const {audiLog, ipIntel,domainIntel, clientIpAddress,hostIpAddress} = require('../pangea/pangea');
 router.post("/createuser", async (req,res)=>{
     const {email,name,password} = req.body;
     const findUser = await userModel.findOne({email : email});
@@ -11,6 +11,14 @@ router.post("/createuser", async (req,res)=>{
         // user found ask to log in in msg
         msg = "user found";
         description = "This user already exists. Please Log In";
+        audiLog.log({
+            actor: email,
+            action: "Create User",
+            status: "Failed",
+            target:`${hostIpAddress(req)}`,
+            source:`${clientIpAddress(req)}`,
+            message: description,
+          })
         res.json({"msg": msg,"description" : description});
     }else{
     // new user save to data base
@@ -20,6 +28,14 @@ router.post("/createuser", async (req,res)=>{
         req.session.isAuth = true;
         msg = "user created";
         description = "user created now fetch user";
+        audiLog.log({
+            actor: email,
+            action: "Create User",
+            status: "success",
+            target:`${hostIpAddress(req)}`,
+            source:`${clientIpAddress(req)}`,
+            message: description,
+          })
         res.json({"msg":msg,"description":description});
     }
 });
