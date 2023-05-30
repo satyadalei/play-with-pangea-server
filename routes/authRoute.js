@@ -4,7 +4,7 @@ const userModel = require('../models/userModel');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const {audiLog, userIntel,ipIntel,domainIntel, clientIpAddress,hostIpAddress} = require('../pangea/pangea');
-// const requestIp = require('request-ip');
+const requestIp = require('request-ip');
 router.post("/createuser", async (req,res)=>{
     const {email,name,password} = req.body;
     const findUser = await userModel.findOne({email : email});
@@ -14,8 +14,8 @@ router.post("/createuser", async (req,res)=>{
     const ip_address = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
     console.log(ip_address);
     console.log("another format");
-    // const clientIp = requestIp.getClientIp(req); 
-    // console.log(clientIp);
+    const clientIp = requestIp.getClientIp(req); 
+    console.log(clientIp);
     //embargo
     // const responseEmbargo = await embargo.ipCheck(`${clientIpAddress(req)}`);
     // console.log(responseEmbargo);
