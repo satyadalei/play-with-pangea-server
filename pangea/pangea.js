@@ -13,7 +13,7 @@ const pangeaDomain = process.env.PANGEA_DOMAIN;
 const auditLogToken = process.env.AUDIT_LOG_TOKEN; // audit-log-token
 const ipIntelToken  = process.env.IP_INTEL_TOKEN;  // ip-intel-token
 const domainIntelToken = process.env.DOMAIN_INTEL_TOKEN; //domain-intel token
-
+const userIntelToken = process.env.USER_INTEL_TOKEN;
 //config - think like connecting your app to pangea domain
 const config = new PangeaConfig({ domain: pangeaDomain });
 
@@ -21,7 +21,7 @@ const config = new PangeaConfig({ domain: pangeaDomain });
 const audiLog = new AuditService(auditLogToken,config);
 const ipIntel = new IPIntelService(ipIntelToken,config);
 const domainIntel = new DomainIntelService(domainIntelToken,config);
-
+const userIntel = new UserIntelService(userIntelToken,config)
 //get ip address of user and host
 //---> this is helpfull when some one requests to my server. then i can recognise his ip address easily
 const clientIpAddress = (req) => {
@@ -37,4 +37,4 @@ const hostIpAddress = (req) => {
 
 
 // export modules 
-module.exports = {audiLog, ipIntel,domainIntel, clientIpAddress,hostIpAddress};
+module.exports = {audiLog, ipIntel,domainIntel,userIntel, clientIpAddress,hostIpAddress};

@@ -30,7 +30,7 @@ app.use(session({
    }
 }))
 //secure : true
-      console.log(process.env.MODE === "production" ? false : true);
+      console.log("Deploay mode :" + (process.env.MODE === "production" ? false : true));
 //CORS - Cross Origin Resource Sharing
 
 app.use(express.json());

@@ -1,12 +1,43 @@
 const express = require('express');
 const router = express.Router();
 const userModel = require('../models/userModel');
-const {audiLog, ipIntel,domainIntel, clientIpAddress,hostIpAddress} = require('../pangea/pangea');
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
+const {audiLog, userIntel,ipIntel,domainIntel, clientIpAddress,hostIpAddress} = require('../pangea/pangea');
 router.post("/createuser", async (req,res)=>{
     const {email,name,password} = req.body;
     const findUser = await userModel.findOne({email : email});
     let msg;
     let description;
+    console.log(clientIpAddress(req));
+
+    //embargo
+    // const responseEmbargo = await embargo.ipCheck(`${clientIpAddress(req)}`);
+    // console.log(responseEmbargo);
+    //geo locate
+    const ipIntelResponse = await ipIntel.geolocate(
+        `${clientIpAddress(req)}`,
+        {
+          provider: "digitalelement"
+        }
+    )
+    console.log(ipIntelResponse);
+    //is proxy
+    const responseIsproxy = await ipIntel.isProxy(
+        `${clientIpAddress(req)}`,
+        {
+          provider: "digitalelement"
+        }
+      );
+      console.log(responseIsproxy);
+      //is vpn
+      const responseVpn = await ipIntel.isVPN(
+        `${clientIpAddress(req)}`,
+        {
+          provider: "digitalelement"
+        }
+      );
+      console.log(responseVpn);
     if (findUser) {
         // user found ask to log in in msg
         msg = "user found";
@@ -22,7 +53,20 @@ router.post("/createuser", async (req,res)=>{
         res.json({"msg": msg,"description" : description});
     }else{
     // new user save to data base
-        const newUser = new userModel({email,name,password});
+        const salt = bcrypt.genSaltSync(saltRounds);
+        const hashedPassword = bcrypt.hashSync(password, salt);
+        //check whether users hashed password is breached or not
+        // hash  type not working
+        // const options = {provider: "spycloud", verbose: true, raw: true };
+        // const response = await userIntel.passwordBreached(userIntel.HashType.SHA256, hashedPassword, options);
+        const request = {email: email, verbose: true, raw: true };
+        const response = await userIntel.userBreached(request);
+        if (response.result.data.found_in_breach) {
+            //means this email is breached
+            // total no of breach = response.result.data.breach_count = 1
+        }
+        console.log(response);
+        const newUser = new userModel({email,name,hashedPassword});
         await newUser.save();
         req.session.userID = newUser._id;
         req.session.isAuth = true;
